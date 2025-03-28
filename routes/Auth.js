@@ -17,12 +17,9 @@ router.post('/signup',async(req,res)=>{
         if (existingUser) {
             return res.status(400).json({message: 'User already exists'});
         } else {
-            
-
             const hashPassword = await bcrypt.hash(password,10);
             const newUser = new authModel({uname,email,password: hashPassword});
             await newUser.save();
-            
         }
         
     } catch (error) {
@@ -40,7 +37,7 @@ router.post('/login', async(req,res)=>{
         const user = await authModel.findOne({email});
 
         if (!user) {
-            return res.status(400).json({message: 'User does not exist'});
+            return res.status(400).json({message: 'User not exist'});
         }
         else{
             const userFound = await bcrypt.compare(password,user.password)
@@ -48,16 +45,13 @@ router.post('/login', async(req,res)=>{
                 return res.status(400).json({message: 'Invalid password'});
             } else {
                 const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN_SECRET, { expiresIn: '1h' });
-                res.status(200).json({ message: 'Login successful', token, userId: user._id });
+                res.status(200).json({ message: 'Login success', token, userId: user._id });
 
             }
         }
-        
     } catch (error) {
-        console.error(error);
-        
+        console.error(error);   
     }
-
 })
 
 module.exports = router;
