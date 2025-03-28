@@ -54,4 +54,60 @@ router.post('/login', async(req,res)=>{
     }
 })
 
+// http://localhost:3000/auth/resetpassword
+router.post('/resetpassword',async(req,res)=>{
+    const email = req.body.email;
+    const password = req.body.password;
+    try {
+        const user = await authModel.findOne({email});
+
+        if(!user){
+            return res.json({message:'User not found'})
+        }
+        else{
+            const hashPassword = await bcrypt.hash(password,10)
+            user.password = hashPassword;
+            await user.save();
+            console.log('Pass updated')
+        }
+
+    } catch (error) {
+        console.error(error);
+        
+    }
+})
+
+
+//http://localhost:3000/auth/fethuser
+router.get('/fetchuser',async(req,res)=>{
+    const email = req.body.email
+    try {
+
+        const users = await authModel.find({email})
+        if(!users){
+            console.log('User not found')
+        }
+        else{
+            res.json(users)
+        }
+    } catch (error) {
+        console.error(error);
+        
+    }
+})
+
+
+router.delete('/deleteuser',async(req,res)=>{
+    const email = req.body.email
+
+    try {
+        const users = await authModel.findOneAndDelete({email})
+        res.json(users)
+
+    } catch (error) {
+        console.error(error)
+        
+    }
+})
+
 module.exports = router;
