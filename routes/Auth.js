@@ -78,12 +78,14 @@ router.post('/resetpassword',async(req,res)=>{
 })
 
 
-//http://localhost:3000/auth/fethuser
-router.get('/fetchuser',async(req,res)=>{
-    const email = req.body.email
-    try {
+//http://localhost:3000/auth/fetchuser
+router.post('/fetchuser',async(req,res)=>{
+    const _id = req.body._id
+    console.log(_id)
 
-        const users = await authModel.find({email})
+    try {
+        // const users = await authModel.findById(_id)
+        const users = await authModel.find()
         if(!users){
             console.log('User not found')
         }
@@ -96,17 +98,38 @@ router.get('/fetchuser',async(req,res)=>{
     }
 })
 
+//http://localhost:3000/auth/updateuser/:id
+router.put('/updateuser/:id',async(req,res)=>{
+    const _id = req.body._id
 
-router.delete('/deleteuser',async(req,res)=>{
-    const email = req.body.email
-
+    console.log(_id)
+    
     try {
-        const users = await authModel.findOneAndDelete({email})
-        res.json(users)
+        const updatedUser = await authModel.findByIdAndUpdate(_id,{$set: req.body}, {new:true})
+        res.json(updatedUser);
 
     } catch (error) {
+        console.error(error);
+    }
+})
+
+
+
+//http://localhost:3000/auth/deleteuser
+router.delete('/deleteuser',async(req,res)=>{
+    const email = req.body.email
+    console.log(email)
+    try {
+        const users = await authModel.findOneAndDelete({email})
+        console.log(users)
+        if (!users) {
+            console.log('Email not found')
+            res.json({message:'Email not found'})
+        } else {
+            res.json(users)
+        }
+    } catch (error) {
         console.error(error)
-        
     }
 })
 
